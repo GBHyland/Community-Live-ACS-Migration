@@ -256,7 +256,7 @@ curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/
 > New Tests for this stage:  
 
 1. Open `http://your-ip:8081/` (ADW) in your browser.
-2. Log in with credentials from .env (ALFRESCO_ADMIN_USER / ALFRESCO_ADMIN_PASSWORD, defaults usually admin / admin).
+2. Log in with credentials from .env (loacted in root directory) (default should be: `admin` / `admin`).
 3. Upload a new text document with a unique word in its body (for example: stage06-e2e-2026).
 4. Search in ADW for that unique word and open the returned document.
 5. Open `http://your-ip:8082/share` and confirm the same document appears.
@@ -265,6 +265,56 @@ curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/
 > Expected:  
 > Login works in all three UIs, upload succeeds, and full-text search returns the newly uploaded document.  
 > This confirms repo, transform, messaging, and OpenSearch indexing are working together.  
+
+
+---  
+
+## Stage 07
+This stage adds a centralized NGINX reverse proxy layer in front of all the Alfresco applications.
+
+### Docker Commands:
+```
+docker compose --env-file .env -f stages/06-full-stack/compose.yaml down
+```
+```
+docker compose --env-file .env -f stages/07-full-stack-proxy/compose.yaml up
+```
+
+### Test:
+Validate the Database  
+```
+docker compose --env-file .env -f stages/06-full-stack/compose.yaml exec -T postgres \
+  sh -c 'pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"'
+```
+> Expected:
+> /var/run/postgresql:5432 - accepting connections
+
+  
+Validate the Repository
+```
+curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
+```
+> Expected:
+> {"entry":{"message":"readyProbe: Success - Tested"}}
+
+
+> [!NOTE]
+> New Tests for this stage:  
+
+Validate Proxy
+```
+docker compose --env-file .env -f stages/07-full-stack-proxy/compose.yaml ps proxy
+curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
+curl -fL http://localhost:8080/workspace
+curl -fL http://localhost:8080/share
+```
+> Expected:  
+> proxy is Up and `/alfresco`, `/workspace`, and `/share` respond through port 8080
+
+
+---  
+
+
 
 
 
