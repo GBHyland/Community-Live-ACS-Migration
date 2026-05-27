@@ -168,8 +168,8 @@ curl -u "admin:admin" \
   "http://localhost:8080/alfresco/api/-default-/public/search/versions/1/search"
 ```
 > Expected something similar to:  
-> { "responseHeader": {"status": 0, ...}, ... }
-> {"list": {"pagination": { "count": ..., ... },"entries": [ ... ]}}
+> { "responseHeader": {"status": 0, ...}, ... }  
+> {"list": {"pagination": { "count": ..., ... },"entries": [ ... ]}}  
 
 
 ---  
@@ -217,8 +217,8 @@ curl -u "admin:admin" \
   "http://localhost:8080/alfresco/api/-default-/public/search/versions/1/search"
 ```
 > Expected:  
-> { "hits": { "total": { "value": ..., ... }, "hits": [ ... ] } }
-> {"list": {"pagination": { "count": ..., ... },"entries": [ ... ]}}
+> { "hits": { "total": { "value": ..., ... }, "hits": [ ... ] } }  
+> {"list": {"pagination": { "count": ..., ... },"entries": [ ... ]}}  
 
 
 ---  
