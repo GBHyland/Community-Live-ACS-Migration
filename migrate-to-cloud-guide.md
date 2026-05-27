@@ -257,10 +257,10 @@ curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/
 
 1. Open `http://your-ip:8081/` (ADW) in your browser.
 2. Log in with credentials from .env (loacted in root directory) (default should be: `admin` / `admin`).
-3. Upload a new text document with a unique word in its body (for example: stage06-e2e-2026).
-4. Search in ADW for that unique word and open the returned document.
-5. Open `http://your-ip:8082/share` and confirm the same document appears.
-6. Open `http://your-ip:8083/` (Control Center) and confirm login works.
+3. Open `http://your-ip:8082/share` (use same credentials from above).
+4. Create a site then create a new text document with a unique word in its body (for example: `stage06-e2e-2026`).
+5. Search in share for that unique word and open the returned document.
+7. Open `http://your-ip:8083/` (Control Center) and confirm login works.
 
 > Expected:  
 > Login works in all three UIs, upload succeeds, and full-text search returns the newly uploaded document.  
@@ -311,8 +311,59 @@ curl -fL http://localhost:8080/share
 > Expected:  
 > proxy is Up and `/alfresco`, `/workspace`, and `/share` respond through port 8080
 
+**Test in the browser**
+1. Open `http://your-ip:8080/share` (ADW) in your browser.
+2. Log in with credentials from .env (loacted in root directory) (default should be: `admin` / `admin`).
+> Expected:  
+> Alfresco share should load via port 8080 (proxy)
+
 
 ---  
+
+## Stage 08
+This stage essentially transforms the Stage 07 environment into a much more production-ready, resilient, and operationally managed ACS platform, focusing on Reliability, Persistence, Resource management, Health monitoring, Operational stability, and Container lifecycle management.
+
+### Docker Commands:
+```
+docker compose --env-file .env -f stages/07-full-stack-proxy/compose.yaml down
+```
+```
+docker compose --env-file .env -f stages/08-best-practices/compose.yaml up
+```
+
+### Test:
+Validate the Database  
+```
+docker compose --env-file .env -f stages/07-full-stack-proxy/compose.yaml exec -T postgres \
+  sh -c 'pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"'
+```
+> Expected:
+> /var/run/postgresql:5432 - accepting connections
+
+  
+Validate the Repository
+```
+curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
+```
+> Expected:
+> {"entry":{"message":"readyProbe: Success - Tested"}}
+
+
+> [!NOTE]
+> New Tests for this stage:  
+
+Validate Runtime Controls
+```
+docker compose --env-file .env -f stages/08-best-practices/compose.yaml ps
+docker compose --env-file .env -f stages/08-best-practices/compose.yaml ps | grep -E "healthy|running"
+```
+> Expected:  
+> core services report healthy/running and compose config contains deploy/resources/healthcheck/restart/service_healthy directives
+
+
+---  
+
+
 
 
 
