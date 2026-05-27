@@ -1,4 +1,4 @@
-# ACS Migration to Docker Containerized
+# ACS Migration Preparation
 
 ---  
 
@@ -70,6 +70,22 @@ docker ps
 > If this command runs then you are done!
 
 ---  
+
+### Clone the Migration Git Repository
+> CD into the installation folder
+```
+git clobe https://github.com/aborroy/alfresco-onprem-to-cloud-lab.git
+```
+```
+cd alfresco-onprem-to-cloud-lab/
+```
+
+### Follow Steps on the Migration Guide
+[Alfresco OnPrem to Cloud Lab]([https://google.com](https://github.com/aborroy/alfresco-onprem-to-cloud-lab))
+
+
+
+
 
 
 
