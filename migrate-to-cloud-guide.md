@@ -373,7 +373,8 @@ cd stages/09-addons
 ../../shared/fetch-addons.sh
 ```
 ```
-cd ..
+cd ..  
+cd ..  
 ```
 ```
 docker compose --env-file .env -f stages/08-best-practices/compose.yaml down
