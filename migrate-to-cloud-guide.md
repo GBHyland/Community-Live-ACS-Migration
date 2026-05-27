@@ -12,7 +12,7 @@
 ## Stage 01
 Start a small ACS environment named acs26-stage01 with two services: PostgreSQL and Alfresco Content Repository
 
-### Docker Command:
+### Docker Commands:
 ```
 docker compose --env-file .env -f stages/01-repo/compose.yaml up
 ```
@@ -26,6 +26,7 @@ docker compose --env-file .env -f stages/01-repo/compose.yaml exec -T postgres \
 > Expected:
 > /var/run/postgresql:5432 - accepting connections
 
+  
 Validate the Repository
 ```
 curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
@@ -39,12 +40,15 @@ curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/
 ## Stage 02
 Keep the same services stage01, and add Transform Core AIO so Alfresco can perform document transformations.
 
-**Docker Command:** 
+### Docker Commands:
 ```
-docker compose --env-file .env -f stages/01-repo/compose.yaml up
+docker compose --env-file .env -f stages/01-repo/compose.yaml down
+```
+```
+docker compose --env-file .env -f stages/02-transform-core-aio/compose.yaml up
 ```
 
-**Test:**  
+### Test:
 Validate the Database  
 ```
 docker compose --env-file .env -f stages/01-repo/compose.yaml exec -T postgres \
@@ -52,6 +56,29 @@ docker compose --env-file .env -f stages/01-repo/compose.yaml exec -T postgres \
 ```
 > Expected:
 > /var/run/postgresql:5432 - accepting connections
+
+  
+Validate the Repository
+```
+curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
+```
+> Expected:
+> {"entry":{"message":"readyProbe: Success - Tested"}}
+
+
+> New Tests for this stage:  
+Validate Transform
+```
+docker compose --env-file .env -f stages/02-transform-core-aio/compose.yaml exec -T transform-core-aio \
+  curl -sf http://localhost:8090/ready
+```
+> Expected:
+> Success - No transform.
+
+---  
+
+
+
 
 
 
