@@ -67,6 +67,7 @@ curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/
 
 
 > New Tests for this stage:  
+
 Validate Transform
 ```
 docker compose --env-file .env -f stages/02-transform-core-aio/compose.yaml exec -T transform-core-aio \
