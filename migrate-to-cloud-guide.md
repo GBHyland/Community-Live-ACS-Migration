@@ -283,7 +283,7 @@ docker compose --env-file .env -f stages/07-full-stack-proxy/compose.yaml up
 ### Test:
 Validate the Database  
 ```
-docker compose --env-file .env -f stages/06-full-stack/compose.yaml exec -T postgres \
+docker compose --env-file .env -f stages/07-full-stack-proxy/compose.yaml exec -T postgres \
   sh -c 'pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"'
 ```
 > Expected:
