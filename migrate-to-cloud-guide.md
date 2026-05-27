@@ -66,7 +66,8 @@ curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/
 > {"entry":{"message":"readyProbe: Success - Tested"}}
 
 
->! New Tests for this stage:  
+> [!NOTE]
+> New Tests for this stage:  
 
 Validate Transform
 ```
