@@ -428,23 +428,6 @@ docker compose --env-file .env -f stages/10-restore-onprem/compose.yaml up --bui
 ```
 
 ### Test:
-Validate the Database  
-```
-docker compose --env-file .env -f stages/10-restore-onprem/compose.yaml exec -T postgres \
-  sh -c 'pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"'
-```
-> Expected:
-> /var/run/postgresql:5432 - accepting connections
-
-  
-Validate the Repository
-```
-curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
-```
-> Expected:
-> {"entry":{"message":"readyProbe: Success - Tested"}}
-
-
 > [!NOTE]
 > New Tests for this stage:  
 
@@ -457,6 +440,42 @@ docker compose --env-file .env -f stages/10-restore-onprem/compose.yaml ps searc
 ```
 > Expected:  
 > restore mounts are present, prefix map file exists, reindexing runs/completes, and live indexing starts afterwards
+
+
+---  
+
+## Stage 11
+This stage is the introduction of HTTPS / SSL-secured platform access through the NGINX proxy, adding SSL/TLS certificates, HTTPS routing, Secure browser access, Secure Share/ADW URLs, and Secure proxy configuration.
+
+### Docker Commands:
+```
+cd stages/11-security-local
+NGINX_SERVER_NAME=localhost ./generate-certs.sh
+```
+```
+cd ../..
+```
+```
+docker compose --env-file .env -f stages/10-restore-onprem/compose.yaml down
+```
+```
+docker compose --env-file .env -f stages/11-security-local/compose.yaml up --build
+```
+
+### Test:
+> [!NOTE]
+> New Tests for this stage:  
+
+Validate TLS Security:
+```
+curl -k -f https://localhost:8443/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
+curl -I http://localhost:8080 | head -n 1
+openssl s_client -connect localhost:8443 -tls1_3
+```
+> Expected:  
+> HTTPS probe succeeds, HTTP endpoint redirects, and TLS 1.3 handshake is established
+
+
 
 
 
