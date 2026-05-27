@@ -430,7 +430,7 @@ docker compose --env-file .env -f stages/10-restore-onprem/compose.yaml up --bui
 ### Test:
 Validate the Database  
 ```
-docker compose --env-file .env -f stages/09-addons/compose.yaml exec -T postgres \
+docker compose --env-file .env -f stages/10-restore-onprem/compose.yaml exec -T postgres \
   sh -c 'pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"'
 ```
 > Expected:
