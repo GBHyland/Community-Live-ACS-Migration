@@ -81,7 +81,7 @@ cd alfresco-onprem-to-cloud-lab/
 ```
 
 ### Follow Steps on the Migration Guide
-[Alfresco OnPrem to Cloud Lab]([https://google.com](https://github.com/aborroy/alfresco-onprem-to-cloud-lab)  
+[Alfresco OnPrem to Cloud Lab](https://github.com/aborroy/alfresco-onprem-to-cloud-lab)  
 
 ---  
 
