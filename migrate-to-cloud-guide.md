@@ -363,6 +363,60 @@ docker compose --env-file .env -f stages/08-best-practices/compose.yaml ps | gre
 
 ---  
 
+## Stage 09
+This stage builds on Stage 08 by adding custom addon support for Alfresco Repository and Share, changing the Alfresco Repository and Share to add a customization layer making it more extensible.
+
+### Docker Commands:
+Fetch artifacts automatically:
+```
+cd stages/09-addons
+../../shared/fetch-addons.sh
+```
+```
+cd ..
+```
+```
+docker compose --env-file .env -f stages/08-best-practices/compose.yaml down
+```
+```
+docker compose --env-file .env -f stages/09-addons/compose.yaml up --build
+```
+
+### Test:
+Validate the Database  
+```
+docker compose --env-file .env -f stages/09-addons/compose.yaml exec -T postgres \
+  sh -c 'pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"'
+```
+> Expected:
+> /var/run/postgresql:5432 - accepting connections
+
+  
+Validate the Repository
+```
+curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
+```
+> Expected:
+> {"entry":{"message":"readyProbe: Success - Tested"}}
+
+
+> [!NOTE]
+> New Tests for this stage:  
+
+Validate Addond Build:
+```
+docker compose --env-file .env -f stages/09-addons/compose.yaml ps alfresco share
+docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E \
+  'local/alfresco-content-repository-addons|local/alfresco-share-addons'
+```
+> Expected:  
+> alfresco/share are Up and local addon images are present
+
+
+---  
+
+
+
 
 
 
