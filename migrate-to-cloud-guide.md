@@ -75,9 +75,54 @@ docker compose --env-file .env -f stages/02-transform-core-aio/compose.yaml exec
   curl -sf http://localhost:8090/ready
 ```
 > Expected:
-> Success - No transform.
+> curl -sf http://localhost:8090/ready
+
 
 ---  
+
+## Stage 03
+The setup moves from simple transformations to a more complete Alfresco transform-service architecture, adding ActiveMQ, Shared File Store, and the Transform Router.
+
+### Docker Commands:
+```
+docker compose --env-file .env -f stages/02-transform-core-aio/compose.yaml down
+```
+```
+docker compose --env-file .env -f stages/03-transform-service-ats/compose.yaml up
+```
+
+### Test:
+Validate the Database  
+```
+docker compose --env-file .env -f stages/03-transform-service-ats/compose.yaml exec -T postgres \
+  sh -c 'pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"'
+```
+> Expected:
+> /var/run/postgresql:5432 - accepting connections
+
+  
+Validate the Repository
+```
+curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
+```
+> Expected:
+> {"entry":{"message":"readyProbe: Success - Tested"}}
+
+
+> [!NOTE]
+> New Tests for this stage:  
+
+Validate Transform
+```
+curl -f -u admin:admin http://localhost:8161
+docker compose --env-file .env -f stages/03-transform-service-ats/compose.yaml exec -T shared-file-store \
+  curl -sf http://localhost:8099/ready
+docker compose --env-file .env -f stages/03-transform-service-ats/compose.yaml exec -T transform-router \
+  curl -sf http://localhost:8095/actuator/health
+```
+> Expected:
+> curl -sf http://localhost:8090/ready
+
 
 
 
