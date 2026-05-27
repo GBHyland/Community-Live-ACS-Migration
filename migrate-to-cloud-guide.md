@@ -168,8 +168,8 @@ curl -u "admin:admin" \
   "http://localhost:8080/alfresco/api/-default-/public/search/versions/1/search"
 ```
 > Expected something similar to:  
-> {"responseHeader":{"status":0,"QTime":547,"params":{"q":"*","rows":"1","wt":"json"}},"_original_parameters_":{"q":"*","defType":"afts","df":"suggest","rows":"1","wt":"json","echoParams":"explicit"},"_field_mappings_":{},"_date_mappings_":{},"_range_mappings_":{},"_pivot_mappings_":{},"_interval_mappings_":{},"_stats_field_mappings_":{},"_stats_facet_mappings_":{},"_facet_function_mappings_":{},"lastIndexedTx":18,"lastIndexedTxTime":1779892817918,"txRemaining":0,"response":{"numFound":780,"start":0,"docs":[{"DBID":844,"id":"_DEFAULT_!800000000000034c"}]},"processedDenies":false}
-{"list":{"pagination":{"count":1,"hasMoreItems":true,"totalItems":6,"skipCount":0,"maxItems":1},"context":{"consistency":{"lastTxId":18}},"entries":[{"entry":{"isFile":true,"createdByUser":{"id":"System","displayName":"System"},"modifiedAt":"2026-05-27T14:40:01.802+0000","nodeType":"cm:content","content":{"mimeType":"application/x-javascript","mimeTypeName":"JavaScript","sizeInBytes":2271,"encoding":"UTF-8"},"parentId":"e5701d87-adc1-4ba3-b01d-87adc11ba33c","createdAt":"2026-05-27T14:40:01.802+0000","isFolder":false,"search":{"score":1.0},"modifiedByUser":{"id":"System","displayName":"System"},"name":"example test script.js.sample","location":"nodes","id":"941c4ecc-26ad-4be2-9c4e-cc26ad8be202"}}]}}
+> { "responseHeader": {"status": 0, ...}, ... }
+> {"list": {"pagination": { "count": ..., ... },"entries": [ ... ]}}
 
 
 ---  
