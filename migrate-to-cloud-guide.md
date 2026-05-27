@@ -416,6 +416,49 @@ docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E \
 
 ---  
 
+## Stage 10
+This stage builds directly on Stage 09 by introducing a much more developer-friendly and externally managed configuration approach by moving important Alfresco data and configuration OUTSIDE the container images.
+
+### Docker Commands:
+```
+docker compose --env-file .env -f stages/09-addons/compose.yaml down
+```
+```
+docker compose --env-file .env -f stages/10-restore-onprem/compose.yaml up --build
+```
+
+### Test:
+Validate the Database  
+```
+docker compose --env-file .env -f stages/09-addons/compose.yaml exec -T postgres \
+  sh -c 'pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"'
+```
+> Expected:
+> /var/run/postgresql:5432 - accepting connections
+
+  
+Validate the Repository
+```
+curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
+```
+> Expected:
+> {"entry":{"message":"readyProbe: Success - Tested"}}
+
+
+> [!NOTE]
+> New Tests for this stage:  
+
+Validate Restore Inputs:
+```
+docker compose --env-file .env -f stages/10-restore-onprem/compose.yaml exec -T alfresco sh -c \
+  'test -d /usr/local/tomcat/alf_data && test -d /usr/local/tomcat/shared/classes/alfresco/extension && echo "restore mounts present"'
+test -s shared/reindex/reindex.prefixes-file.json && echo "prefix map generated"
+docker compose --env-file .env -f stages/10-restore-onprem/compose.yaml ps search-reindexing search-live-indexing
+```
+> Expected:  
+> restore mounts are present, prefix map file exists, reindexing runs/completes, and live indexing starts afterwards
+
+
 
 
 
