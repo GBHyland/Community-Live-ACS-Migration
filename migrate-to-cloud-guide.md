@@ -26,7 +26,14 @@
 > - Pay attention to the commands below to use the right tabs: **Docker Command** and **Test**
 > - When progressing to the next stage, use CTRL+C in the **Docker** tab to stop the services and the 
 
----
+---  
+
+## Setup  
+1. Open a Terminal window at the `installation` directory and dedicate this terminal tab to your Docker Compose commands (suggest naming this tab `DOCKER`).
+2. Open a new Terminal Tab and navigate to the same `installation` directory; dedicate this tab to testing commands (suggest naming this tab `TESTING`).
+
+
+---  
 
 ## Stage 01
 Start a small ACS environment named acs26-stage01 with two services: PostgreSQL and Alfresco Content Repository
