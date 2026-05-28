@@ -65,7 +65,6 @@ docker compose --env-file .env -f stages/01-repo/compose.yaml up
 ```
 
 ### Test:
-Validate the Database  
 
 ---  
 > NOTE:
@@ -80,6 +79,7 @@ newgrp docker
 ```  
 ---  
 
+Validate the Database  
 ```
 docker compose --env-file .env -f stages/01-repo/compose.yaml exec -T postgres \
   sh -c 'pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"'
@@ -136,7 +136,7 @@ docker compose --env-file .env -f stages/02-transform-core-aio/compose.yaml exec
   curl -sf http://localhost:8090/ready
 ```
 > Expected:
-> curl -sf http://localhost:8090/ready
+> Ready Probe: Success - Transform
 
 
 ---  
