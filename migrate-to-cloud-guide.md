@@ -29,25 +29,31 @@
 ---  
 
 ## Setup & Discovery  
-1. Choose / create a directory and open a terminal window at that directory and clone this github (suggest same installation root folder from previous ACS class - if taken):
+1. In Visual Studio Code, open a folder location to the planned installation directory, then open a terminal window within VS Code.
+2. Clone this github:
 ```
 git clone https://github.com/GBHyland/Community-Live-ACS-Migration.git
 ```
 
-2. CD into the `Community-Live-ACS-Migration` directory and dedicate this terminal tab to your Docker Compose commands (suggest naming this tab `DOCKER`).
+3. CD into the `Community-Live-ACS-Migration` directory and dedicate this terminal tab to your Docker Compose commands (suggest naming this tab `DOCKER`).
 ```
 cd Community-Live-ACS-Migration
 ```
 
-3. Open a new Terminal Tab and navigate to the same `Community-Live-ACS-Migration` directory; dedicate this tab to testing commands (suggest naming this tab `TESTING`).
-4. In your testing terminal, use cat to open the .env file and review the content:
+4. Open the `.env` file and change the `NGINX_SERVER_NAME=localhost` value, replacing `localhost` with your server's IP adress. ex:
+```
+NGINX_SERVER_NAME=3.85.22.172
+```  
+ 
+6. Open a new Terminal Tab and navigate to the same `Community-Live-ACS-Migration` directory; dedicate this tab to testing commands (suggest naming this tab `TESTING`).
+7. In your testing terminal, use cat to open the .env file and review the content:
 ```
 cat .env
 ```
 
 > Note the different variables and attributes that will be used by the Docker Compose files in each Stage later.
 
-5. Log in with Quay.io: (you will need your Quay username and password)
+8. Log in with Quay.io: (you will need your Quay username and password)
 ```
 # Use your quay username and password/token
 docker login quay.io
