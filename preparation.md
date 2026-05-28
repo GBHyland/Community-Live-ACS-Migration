@@ -74,14 +74,14 @@ docker ps
 ### Clone the Migration Git Repository
 > CD into the installation folder
 ```
-git clobe https://github.com/aborroy/alfresco-onprem-to-cloud-lab.git
+git clobe https://github.com/GBHyland/Community-Live-ACS-Migration.git
 ```
 ```
 cd alfresco-onprem-to-cloud-lab/
 ```
 
 ### Follow Steps on the Migration Guide
-[Alfresco OnPrem to Cloud Lab](https://github.com/aborroy/alfresco-onprem-to-cloud-lab)  
+[Alfresco OnPrem to Cloud Lab](https://github.com/GBHyland/Community-Live-ACS-Migration/blob/main/migrate-to-cloud-guide.md)  
 
 ---  
 
