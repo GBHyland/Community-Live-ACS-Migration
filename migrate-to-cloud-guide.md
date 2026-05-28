@@ -29,7 +29,7 @@
 ---  
 
 ## Setup & Discovery  
-1. Choose / create a local directory and open a terminal window at that directory and clone this github (suggest same installation root folder from previous ACS class - if taken):
+1. Choose / create a directory and open a terminal window at that directory and clone this github (suggest same installation root folder from previous ACS class - if taken):
 ```
 git clone https://github.com/GBHyland/Community-Live-ACS-Migration.git
 ```
