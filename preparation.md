@@ -2,6 +2,8 @@
 
 ---  
 
+**Connect to your provided Server and follow these steps on that server**
+
 ### Update the Server
 ```
 sudo apt update
