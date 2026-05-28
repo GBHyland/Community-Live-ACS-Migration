@@ -66,6 +66,20 @@ docker compose --env-file .env -f stages/01-repo/compose.yaml up
 
 ### Test:
 Validate the Database  
+
+---  
+> NOTE:
+> For the first test (and here on) ensure you are testing in your second terminal tab.
+> Also, ensure you are testing from the `Community-Live-ACS-Migration` directory.
+> If you get a `permission denied while trying to connect to the docker API` error, run these commands in your testing terminal tab:
+```
+sudo usermod -aG docker ubuntu
+```
+```
+newgrp docker
+```  
+---  
+
 ```
 docker compose --env-file .env -f stages/01-repo/compose.yaml exec -T postgres \
   sh -c 'pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"'
