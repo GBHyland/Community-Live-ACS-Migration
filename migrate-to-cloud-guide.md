@@ -514,20 +514,22 @@ docker compose --env-file .env -f stages/10-restore-onprem/compose.yaml ps searc
 This stage is the introduction of HTTPS / SSL-secured platform access through the NGINX proxy, adding SSL/TLS certificates, HTTPS routing, Secure browser access, Secure Share/ADW URLs, and Secure proxy configuration.
 
 ### Docker Commands:
-Replace the IP address with your server IP!
 ```
 cd stages/11-security-local
-NGINX_SERVER_NAME=your-ip ./generate-certs.sh
 ```
+Replace the IP address with your server IP!
+```
+NGINX_SERVER_NAME=your-ip ./generate-certs.sh
+```  
 ```
 cd ../..
-```
+```  
 ```
 docker compose --env-file .env -f stages/10-restore-onprem/compose.yaml down
-```
+```   
 ```
 docker compose --env-file .env -f stages/11-security-local/compose.yaml up --build
-```
+```  
 
 ### Test:
 > [!NOTE]
