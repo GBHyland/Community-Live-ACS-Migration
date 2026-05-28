@@ -379,7 +379,7 @@ curl -fL http://localhost:8080/share
 > proxy is Up and `/alfresco`, `/workspace`, and `/share` respond through port 8080
 
 **Test in the browser**
-1. Open `http://your-ip:8080/share` (ADW) in your browser.
+1. Open `http://your-ip:8080/share` in your browser.
 2. Log in with credentials from .env (loacted in root directory) (default should be: `admin` / `admin`).
 > Expected:  
 > Alfresco share should load via port 8080 (proxy)
