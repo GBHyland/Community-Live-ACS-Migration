@@ -28,10 +28,24 @@
 
 ---  
 
-## Setup  
-1. Open a Terminal window at the `installation` directory and dedicate this terminal tab to your Docker Compose commands (suggest naming this tab `DOCKER`).
-2. Open a new Terminal Tab and navigate to the same `installation` directory; dedicate this tab to testing commands (suggest naming this tab `TESTING`).
+## Setup & Discovery  
+1. Choose / create a local directory and open a terminal window at that directory and clone this github (suggest same installation root folder from previous ACS class - if taken):
+```
+git clone https://github.com/GBHyland/Community-Live-ACS-Migration.git
+```
 
+2. CD into the `Community-Live-ACS-Migration` directory and dedicate this terminal tab to your Docker Compose commands (suggest naming this tab `DOCKER`).
+```
+cd Community-Live-ACS-Migration
+```
+
+3. Open a new Terminal Tab and navigate to the same `Community-Live-ACS-Migration` directory; dedicate this tab to testing commands (suggest naming this tab `TESTING`).
+4. In your testing terminal, use cat to open the .env file and review the content:
+```
+cat .env
+```
+
+> Note the different variables and attributes that will be used by the Docker Compose files in each Stage later.
 
 ---  
 
