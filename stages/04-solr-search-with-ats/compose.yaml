@@ -1,35 +1,6 @@
-# -------------------------------------------------------------------
-# Stage 04 - Enterprise Search Services Integration
-#
-# This Docker Compose file expands the ACS environment by adding
-# Alfresco Search Services using Solr.
-#
-# The environment now includes:
-# - PostgreSQL database
-# - Alfresco Content Services Repository
-# - Solr Search Services
-# - ActiveMQ messaging broker
-# - Shared File Store
-# - Transform Core AIO
-# - Transform Router
-#
-# This stage introduces:
-# - Full-text repository search
-# - Metadata indexing
-# - Solr-based search architecture
-# - Search indexing and query services
-#
-# User interfaces, reverse proxy routing, operational hardening,
-# OpenSearch indexing, and HTTPS security are introduced
-# in later stages.
-# -------------------------------------------------------------------
-
 name: acs26-stage04
 
 services:
-
-  # PostgreSQL database used by Alfresco to store repository metadata,
-  # permissions, node information, and system configuration data.
   postgres:
     image: postgres:${POSTGRES_TAG}
     environment:
@@ -37,9 +8,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  # Alfresco Search Services (Solr) used for repository indexing,
-  # metadata indexing, and full-text search capabilities.
-  # Creates and manages Alfresco search cores.
   solr6:
     image: alfresco/alfresco-search-services:${SEARCH_SERVICES_TAG}
     environment:
@@ -54,8 +22,6 @@ services:
     ports:
       - "${SOLR_HTTP_PORT}:8983"
 
-  # ActiveMQ messaging broker used for asynchronous communication
-  # between transformation and repository services.
   activemq:
     image: quay.io/alfresco/alfresco-activemq:${ACTIVEMQ_TAG}
     ports:
@@ -64,14 +30,9 @@ services:
       ACTIVEMQ_USERNAME: ${ACTIVEMQ_USERNAME}
       ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
 
-  # Shared File Store used to temporarily store files exchanged
-  # between transformation services during processing workflows.
   shared-file-store:
     image: quay.io/alfresco/alfresco-shared-file-store:${SHARED_FILE_STORE_TAG}
 
-  # Transform Core AIO service responsible for generating previews,
-  # thumbnails, renditions, OCR, and document conversions.
-  # Connects to ActiveMQ and Shared File Store.
   transform-core-aio:
     image: quay.io/alfresco/alfresco-transform-core-aio:${TRANSFORM_CORE_AIO_TAG}
     depends_on:
@@ -83,9 +44,6 @@ services:
       ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
       FILE_STORE_URL: http://shared-file-store:8099/alfresco/api/-default-/private/sfs/versions/1/file
 
-  # Transform Router service that receives transformation requests
-  # from Alfresco and routes them to the appropriate transform service.
-  # Acts as the orchestration layer for distributed transformations.
   transform-router:
     image: quay.io/alfresco/alfresco-transform-router:${TRANSFORM_ROUTER_TAG}
     depends_on:
@@ -100,10 +58,6 @@ services:
         -Dqueue.engine.activemq.user=${ACTIVEMQ_USERNAME}
         -Dqueue.engine.activemq.password=${ACTIVEMQ_PASSWORD}
 
-  # Core Alfresco Content Services repository application.
-  # Provides content management APIs, repository services,
-  # content storage management, distributed transformations,
-  # and integrates with Solr-based search services.
   alfresco:
     image: quay.io/alfresco/alfresco-content-repository:${ACS_TAG}
     depends_on:

@@ -1,33 +1,6 @@
-# -------------------------------------------------------------------
-# Stage 01 - Foundational ACS Repository Deployment
-#
-# This Docker Compose file creates the foundational Alfresco
-# Content Services environment used throughout the training.
-#
-# The environment includes:
-# - PostgreSQL database
-# - Alfresco Content Services Repository
-#
-# At this stage the platform provides only the core repository
-# and database services required for basic content management.
-#
-# Additional services such as:
-# - Transformation services
-# - Search/indexing
-# - Messaging
-# - User interfaces
-# - Reverse proxy routing
-# - Operational hardening
-#
-# are introduced progressively in later stages.
-# -------------------------------------------------------------------
-
 name: acs26-stage01
 
 services:
-
-  # PostgreSQL database used by Alfresco to store repository metadata,
-  # permissions, node information, and system configuration data.
   postgres:
     image: postgres:${POSTGRES_TAG}
     environment:
@@ -35,9 +8,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  # Core Alfresco Content Services repository application.
-  # Provides content management APIs, repository services,
-  # content storage management, and connects to PostgreSQL.
   alfresco:
     image: quay.io/alfresco/alfresco-content-repository:${ACS_TAG}
     depends_on:

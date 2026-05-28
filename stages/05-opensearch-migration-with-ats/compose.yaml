@@ -1,38 +1,6 @@
-# -------------------------------------------------------------------
-# Stage 05 - OpenSearch and Live Indexing Architecture
-#
-# This Docker Compose file modernizes the ACS search architecture
-# by replacing Solr with OpenSearch and introducing dedicated
-# indexing services.
-#
-# The environment now includes:
-# - PostgreSQL database
-# - Alfresco Content Services Repository
-# - OpenSearch search engine
-# - ActiveMQ messaging broker
-# - Shared File Store
-# - Transform Core AIO
-# - Transform Router
-# - Search Live Indexing service
-# - Search Reindexing service
-#
-# This stage introduces:
-# - OpenSearch-based indexing
-# - Real-time live indexing
-# - Dedicated repository reindexing jobs
-# - Event-driven indexing architecture
-# - Modern distributed search services
-#
-# User interfaces, reverse proxy routing, operational hardening,
-# custom addons, and HTTPS security are introduced in later stages.
-# -------------------------------------------------------------------
-
 name: acs26-stage05
 
 services:
-
-  # PostgreSQL database used by Alfresco to store repository metadata,
-  # permissions, node information, and system configuration data.
   postgres:
     image: postgres:${POSTGRES_TAG}
     environment:
@@ -40,9 +8,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  # OpenSearch search engine used for repository indexing,
-  # metadata indexing, and full-text search capabilities.
-  # Replaces the Solr-based architecture from Stage 04.
   opensearch:
     image: opensearchproject/opensearch:${OPENSEARCH_TAG}
     environment:
@@ -54,8 +19,6 @@ services:
     ports:
       - "9200:9200"
 
-  # ActiveMQ messaging broker used for asynchronous communication
-  # between transformation, repository, and indexing services.
   activemq:
     image: quay.io/alfresco/alfresco-activemq:${ACTIVEMQ_TAG}
     ports:
@@ -64,14 +27,9 @@ services:
       ACTIVEMQ_USERNAME: ${ACTIVEMQ_USERNAME}
       ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
 
-  # Shared File Store used to temporarily store files exchanged
-  # between transformation and indexing services during workflows.
   shared-file-store:
     image: quay.io/alfresco/alfresco-shared-file-store:${SHARED_FILE_STORE_TAG}
 
-  # Transform Core AIO service responsible for generating previews,
-  # thumbnails, renditions, OCR, and document conversions.
-  # Connects to ActiveMQ and Shared File Store.
   transform-core-aio:
     image: quay.io/alfresco/alfresco-transform-core-aio:${TRANSFORM_CORE_AIO_TAG}
     depends_on:
@@ -83,9 +41,6 @@ services:
       ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
       FILE_STORE_URL: http://shared-file-store:8099/alfresco/api/-default-/private/sfs/versions/1/file
 
-  # Transform Router service that receives transformation requests
-  # from Alfresco and routes them to the appropriate transform service.
-  # Acts as the orchestration layer for distributed transformations.
   transform-router:
     image: quay.io/alfresco/alfresco-transform-router:${TRANSFORM_ROUTER_TAG}
     depends_on:
@@ -100,10 +55,6 @@ services:
         -Dqueue.engine.activemq.user=${ACTIVEMQ_USERNAME}
         -Dqueue.engine.activemq.password=${ACTIVEMQ_PASSWORD}
 
-  # Core Alfresco Content Services repository application.
-  # Provides content management APIs, repository services,
-  # distributed transformations, and integrates with
-  # OpenSearch-based indexing services.
   alfresco:
     image: quay.io/alfresco/alfresco-content-repository:${ACS_TAG}
     depends_on:
@@ -154,8 +105,6 @@ services:
       retries: 5
       start_period: 1m
 
-  # Live indexing service that continuously listens for repository
-  # changes and updates OpenSearch indexes in near real-time.
   search-live-indexing:
     image: quay.io/alfresco/alfresco-elasticsearch-live-indexing:${SEARCH_LIVE_INDEXING_TAG}
     depends_on:
@@ -173,9 +122,6 @@ services:
       ALFRESCO_ACCEPTED_CONTENT_MEDIA_TYPES_CACHE_BASE_URL: http://transform-core-aio:8090/transform/config
       ALFRESCO_SHAREDFILESTORE_BASEURL: http://shared-file-store:8099/alfresco/api/-default-/private/sfs/versions/1/file/
 
-  # Reindexing service used to perform initial full repository
-  # indexing into OpenSearch. Runs as a one-time bootstrap job
-  # before live indexing begins.
   search-reindexing:
     image: quay.io/alfresco/alfresco-elasticsearch-reindexing:${SEARCH_REINDEXING_TAG}
     # One-shot bootstrap job: retry transient failures, then exit permanently on success.
