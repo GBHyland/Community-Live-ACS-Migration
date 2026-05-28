@@ -1,6 +1,25 @@
 # Migrate OnPrem to Cloud
 ---  
 
+## Exercises in this Lab
+| Stage | Formal Title                                    | Brief Summary                                                                                           |
+| ----- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 01    | Foundational ACS Repository Deployment          | Basic Alfresco Content Services repository with PostgreSQL and core repository functionality.           |
+| 02    | Integrated Content Transformation Services      | Adds Transform Core AIO to enable previews, renditions, thumbnails, and document transformations.       |
+| 03    | Distributed Transformation Service Architecture | Introduces ActiveMQ, Shared File Store, and Transform Router for scalable transformation workflows.     |
+| 04    | Enterprise Search Services Integration          | Adds Solr-based Alfresco Search Services for full-text indexing and repository search capabilities.     |
+| 05    | OpenSearch and Live Indexing Architecture       | Replaces Solr with OpenSearch and introduces live indexing and reindexing services.                     |
+| 06    | User Interface and Application Access Layer     | Adds Digital Workspace, Share, and Control Center for browser-based platform interaction.               |
+| 07    | Centralized Reverse Proxy and Routing Layer     | Introduces NGINX reverse proxy for unified routing and single-entry-point access.                       |
+| 08    | Production-Ready Operational Architecture       | Adds persistence, health checks, restart policies, resource controls, and operational hardening.        |
+| 09    | Custom Addon and Extension Deployment Platform  | Introduces custom Repository and Share Docker images for modular Alfresco customization.                |
+| 10    | Externalized Configuration and Data Management  | Externalizes repository data and configuration using bind mounts for easier management and flexibility. |
+| 11    | Secure HTTPS and SSL Access Architecture        | Adds HTTPS/SSL-secured access through NGINX with secure routing and certificate management.             |
+
+
+---  
+
+
 > While running this guide it is optimal to have two terminal tabs: 
 > - Docker Compose Tab: You'll run the stage docker commands here
 > - Testing Tab: You'll run test commands here to test services stood up by the docker compose files.
