@@ -1,6 +1,30 @@
+# -------------------------------------------------------------------
+# Stage 10 - Externalized Configuration and Data Management
+#
+# This Docker Compose file builds on the custom addon platform from
+# Stage 09 by externalizing Alfresco repository data and configuration.
+#
+# This stage keeps:
+# - Custom Alfresco Repository image
+# - Custom Share image
+# - OpenSearch indexing
+# - Transform services
+# - NGINX reverse proxy
+# - Health checks and restart policies
+#
+# This stage introduces:
+# - Host-mounted alf_data repository storage
+# - Host-mounted Alfresco extension configuration
+# - Easier inspection, backup, migration, and configuration changes
+# - Clear separation between application images, runtime config, and data
+# -------------------------------------------------------------------
+
 name: acs26-stage10
 
 services:
+
+  # PostgreSQL database used by Alfresco to store repository metadata.
+  # Includes persistence, resource controls, health checks, and restart behavior.
   postgres:
     image: postgres:${POSTGRES_TAG}
     deploy:
@@ -26,6 +50,8 @@ services:
       start_period: 5s
     restart: unless-stopped
 
+  # OpenSearch search engine used for repository indexing and search.
+  # Stores search indexes in a persistent volume with resource and health controls.
   opensearch:
     image: opensearchproject/opensearch:${OPENSEARCH_TAG}
     deploy:
@@ -61,6 +87,8 @@ services:
       start_period: 30s
     restart: unless-stopped
 
+  # ActiveMQ messaging broker used by transform and indexing services.
+  # Provides asynchronous communication across the ACS platform.
   activemq:
     image: quay.io/alfresco/alfresco-activemq:${ACTIVEMQ_TAG}
     deploy:
@@ -84,6 +112,8 @@ services:
       start_period: 5s
     restart: unless-stopped
 
+  # Shared File Store used by transformation and indexing workflows.
+  # Provides shared temporary file storage between ACS services.
   shared-file-store:
     image: quay.io/alfresco/alfresco-shared-file-store:${SHARED_FILE_STORE_TAG}
     deploy:
@@ -110,6 +140,8 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  # Transform Core AIO performs document conversions, previews,
+  # renditions, thumbnails, and text extraction.
   transform-core-aio:
     image: quay.io/alfresco/alfresco-transform-core-aio:${TRANSFORM_CORE_AIO_TAG}
     deploy:
@@ -141,6 +173,8 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  # Transform Router receives Alfresco transform requests and routes
+  # them to Transform Core AIO using ActiveMQ and Shared File Store.
   transform-router:
     image: quay.io/alfresco/alfresco-transform-router:${TRANSFORM_ROUTER_TAG}
     deploy:
@@ -175,6 +209,9 @@ services:
       start_period: 20s
     restart: unless-stopped
 
+  # Custom Alfresco Content Services repository image.
+  # Uses host-mounted alf_data and extension configuration so repository
+  # data and runtime config can be managed outside the container.
   alfresco:
     image: local/alfresco-content-repository-addons:${ACS_TAG}
     build:
@@ -246,6 +283,8 @@ services:
       start_period: 1m
     restart: unless-stopped
 
+  # Live indexing service that listens for repository events
+  # and keeps OpenSearch updated after reindexing completes.
   search-live-indexing:
     image: quay.io/alfresco/alfresco-elasticsearch-live-indexing:${SEARCH_LIVE_INDEXING_TAG}
     deploy:
@@ -285,6 +324,8 @@ services:
       start_period: 20s
     restart: unless-stopped
 
+  # One-time reindexing service that builds the initial OpenSearch index.
+  # Uses the shared reindex prefixes file to control repository indexing scope.
   search-reindexing:
     image: quay.io/alfresco/alfresco-elasticsearch-reindexing:${SEARCH_REINDEXING_TAG}
     deploy:
@@ -327,6 +368,8 @@ services:
     volumes:
       - ../../shared/reindex/reindex.prefixes-file.json:/config/reindex.prefixes-file.json:ro
 
+  # Alfresco Digital Workspace modern user interface.
+  # Served through the proxy under /workspace/.
   digital-workspace:
     image: quay.io/alfresco/alfresco-digital-workspace:${ADW_TAG}
     deploy:
@@ -354,6 +397,8 @@ services:
       start_period: 5s
     restart: unless-stopped
 
+  # Alfresco Control Center administrative user interface.
+  # Served through the proxy under /admin/.
   control-center:
     image: quay.io/alfresco/alfresco-control-center:${CONTROL_CENTER_TAG}
     deploy:
@@ -379,6 +424,8 @@ services:
       start_period: 5s
     restart: unless-stopped
 
+  # Custom Alfresco Share classic UI image.
+  # Builds Share addons into the image while keeping proxy-aware settings.
   share:
     image: local/alfresco-share-addons:${SHARE_TAG}
     build:
@@ -417,6 +464,8 @@ services:
       start_period: 15s
     restart: unless-stopped
 
+  # NGINX reverse proxy that provides the single platform entry point.
+  # Uses the shared NGINX routing configuration.
   proxy:
     image: nginx:${NGINX_TAG}
     deploy:
