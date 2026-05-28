@@ -1,6 +1,31 @@
+# -------------------------------------------------------------------
+# Stage 02 - Integrated Content Transformation Services
+#
+# This Docker Compose file expands the foundational ACS repository
+# environment by adding Transform Core AIO services.
+#
+# The environment now includes:
+# - PostgreSQL database
+# - Alfresco Content Services Repository
+# - Transform Core AIO
+#
+# This stage introduces document transformation capabilities such as:
+# - PDF previews
+# - Thumbnail generation
+# - Renditions
+# - Document format conversions
+#
+# Search/indexing, messaging infrastructure, user interfaces,
+# reverse proxy routing, and operational hardening are still
+# introduced in later stages.
+# -------------------------------------------------------------------
+
 name: acs26-stage02
 
 services:
+
+  # PostgreSQL database used by Alfresco to store repository metadata,
+  # permissions, node information, and system configuration data.
   postgres:
     image: postgres:${POSTGRES_TAG}
     environment:
@@ -8,9 +33,16 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
+  # Transform Core AIO service used for content transformations.
+  # Provides previews, thumbnails, renditions, and document
+  # conversion capabilities for repository content.
   transform-core-aio:
     image: quay.io/alfresco/alfresco-transform-core-aio:${TRANSFORM_CORE_AIO_TAG}
 
+  # Core Alfresco Content Services repository application.
+  # Provides content management APIs, repository services,
+  # content storage management, and connects to PostgreSQL
+  # and Transform Core AIO.
   alfresco:
     image: quay.io/alfresco/alfresco-content-repository:${ACS_TAG}
     depends_on:
