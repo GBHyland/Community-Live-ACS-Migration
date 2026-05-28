@@ -47,6 +47,13 @@ cat .env
 
 > Note the different variables and attributes that will be used by the Docker Compose files in each Stage later.
 
+5. Log in with Quay.io: (you will need your Quay username and password)
+```
+# Use your quay username and password/token
+docker login quay.io
+```
+
+
 ---  
 
 ## Stage 01
