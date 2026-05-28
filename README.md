@@ -4,11 +4,11 @@ This course guides learners through the progressive design, deployment, customiz
 
 Using a hands-on, architecture-first approach, participants will develop the ability to:
 
-Remember and identify the core components of an enterprise content management ecosystem, including repositories, search engines, messaging brokers, transformation services, and user applications.
-Understand how distributed services interact within a scalable containerized platform architecture.
-Apply Docker Compose, reverse proxy configuration, OpenSearch indexing, transformation services, and secure deployment concepts to real-world platform implementations.
+- Remember and identify the core components of an enterprise content management ecosystem, including repositories, search engines, messaging brokers, transformation services, and user applications.
+- Understand how distributed services interact within a scalable containerized platform architecture.
+- Apply Docker Compose, reverse proxy configuration, OpenSearch indexing, transformation services, and secure deployment concepts to real-world platform implementations.
 Analyze service dependencies, routing flows, indexing pipelines, persistence strategies, and operational health within a multi-service enterprise environment.
-Evaluate architectural tradeoffs involving scalability, customization, operational resiliency, security, and deployment strategies.
-Create a production-style Alfresco Content Services deployment complete with custom addons, externalized configuration, persistent storage, HTTPS security, and enterprise-ready operational controls.
+- Evaluate architectural tradeoffs involving scalability, customization, operational resiliency, security, and deployment strategies.
+- Create a production-style Alfresco Content Services deployment complete with custom addons, externalized configuration, persistent storage, HTTPS security, and enterprise-ready operational controls.
 
 By the end of the course, learners will have constructed a layered, extensible, and secure enterprise content services platform that closely mirrors modern real-world deployment patterns used in large-scale enterprise environments.
