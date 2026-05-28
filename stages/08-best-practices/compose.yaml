@@ -1,27 +1,6 @@
-# -------------------------------------------------------------------
-# Stage 08 - Production-Ready Operational Architecture
-#
-# This Docker Compose file hardens the Stage 07 platform by adding
-# production-style operational controls.
-#
-# The environment now includes:
-# - Persistent storage volumes
-# - Health checks across services
-# - Restart policies
-# - Resource limits and reservations
-# - Health-aware startup dependencies
-# - JVM/container tuning
-#
-# This stage shifts the platform from a functional architecture to
-# a more resilient, maintainable, and operationally stable deployment.
-# -------------------------------------------------------------------
-
 name: acs26-stage08
 
 services:
-
-  # PostgreSQL database used by Alfresco to store repository metadata.
-  # Adds persistence, resource controls, health checks, and restart behavior.
   postgres:
     image: postgres:${POSTGRES_TAG}
     deploy:
@@ -47,8 +26,6 @@ services:
       start_period: 5s
     restart: unless-stopped
 
-  # OpenSearch search engine used for repository indexing and search.
-  # Adds persistent indexes, resource controls, health checks, and tuning.
   opensearch:
     image: opensearchproject/opensearch:${OPENSEARCH_TAG}
     deploy:
@@ -85,8 +62,6 @@ services:
       start_period: 30s
     restart: unless-stopped
 
-  # ActiveMQ messaging broker used by transform and indexing services.
-  # Adds health checks, restart behavior, and resource controls.
   activemq:
     image: quay.io/alfresco/alfresco-activemq:${ACTIVEMQ_TAG}
     deploy:
@@ -110,8 +85,6 @@ services:
       start_period: 5s
     restart: unless-stopped
 
-  # Shared File Store used by transformation and indexing workflows.
-  # Adds persistent temporary storage, cleanup scheduling, and health checks.
   shared-file-store:
     image: quay.io/alfresco/alfresco-shared-file-store:${SHARED_FILE_STORE_TAG}
     deploy:
@@ -138,8 +111,6 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # Transform Core AIO performs document conversions, previews,
-  # renditions, thumbnails, and text extraction.
   transform-core-aio:
     image: quay.io/alfresco/alfresco-transform-core-aio:${TRANSFORM_CORE_AIO_TAG}
     deploy:
@@ -171,8 +142,6 @@ services:
       start_period: 10s
     restart: unless-stopped
 
-  # Transform Router receives Alfresco transform requests and routes
-  # them to Transform Core AIO using ActiveMQ and Shared File Store.
   transform-router:
     image: quay.io/alfresco/alfresco-transform-router:${TRANSFORM_ROUTER_TAG}
     deploy:
@@ -207,9 +176,6 @@ services:
       start_period: 20s
     restart: unless-stopped
 
-  # Core Alfresco Content Services repository.
-  # Adds persistent alf_data storage, health-aware dependencies,
-  # resource controls, and JVM memory tuning.
   alfresco:
     image: quay.io/alfresco/alfresco-content-repository:${ACS_TAG}
     deploy:
@@ -275,8 +241,6 @@ services:
       start_period: 1m
     restart: unless-stopped
 
-  # Live indexing service that listens for repository events
-  # and keeps OpenSearch updated after reindexing completes.
   search-live-indexing:
     image: quay.io/alfresco/alfresco-elasticsearch-live-indexing:${SEARCH_LIVE_INDEXING_TAG}
     deploy:
@@ -316,8 +280,6 @@ services:
       start_period: 20s
     restart: unless-stopped
 
-  # One-time reindexing service that builds the initial OpenSearch index.
-  # Runs before live indexing begins and retries transient failures.
   search-reindexing:
     image: quay.io/alfresco/alfresco-elasticsearch-reindexing:${SEARCH_REINDEXING_TAG}
     deploy:
@@ -360,8 +322,6 @@ services:
     volumes:
       - ../../shared/reindex/reindex.prefixes-file.json:/config/reindex.prefixes-file.json:ro
 
-  # Alfresco Digital Workspace modern user interface.
-  # Adds health checks, restart behavior, and proxy-aware base path.
   digital-workspace:
     image: quay.io/alfresco/alfresco-digital-workspace:${ADW_TAG}
     deploy:
@@ -391,8 +351,6 @@ services:
       start_period: 5s
     restart: unless-stopped
 
-  # Alfresco Control Center administrative user interface.
-  # Adds health checks, restart behavior, and proxy base path.
   control-center:
     image: quay.io/alfresco/alfresco-control-center:${CONTROL_CENTER_TAG}
     deploy:
@@ -418,8 +376,6 @@ services:
       start_period: 5s
     restart: unless-stopped
 
-  # Alfresco Share classic UI.
-  # Adds proxy-aware CSRF settings, health checks, and restart behavior.
   share:
     image: quay.io/alfresco/alfresco-share:${SHARE_TAG}
     deploy:
@@ -453,8 +409,6 @@ services:
       start_period: 15s
     restart: unless-stopped
 
-  # NGINX reverse proxy that provides the single platform entry point.
-  # Adds health checks, restart behavior, and waits for UI services.
   proxy:
     image: nginx:${NGINX_TAG}
     deploy:
