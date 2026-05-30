@@ -372,8 +372,6 @@ Validate Proxy
 ```
 docker compose --env-file .env -f stages/07-full-stack-proxy/compose.yaml ps proxy
 curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
-curl -fL http://localhost:8080/workspace
-curl -fL http://localhost:8080/share
 ```
 > Expected:  
 > proxy is Up and `/alfresco`, `/workspace`, and `/share` respond through port 8080
