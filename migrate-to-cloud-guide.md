@@ -432,22 +432,6 @@ docker compose --env-file .env -f stages/09-addons/compose.yaml up --build
 ```
 
 ### Test:
-Validate the Database  
-```
-docker compose --env-file .env -f stages/09-addons/compose.yaml exec -T postgres \
-  sh -c 'pg_isready -d "$POSTGRES_DB" -U "$POSTGRES_USER"'
-```
-> Expected:
-> /var/run/postgresql:5432 - accepting connections
-
-  
-Validate the Repository
-```
-curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
-```
-> Expected:
-> {"entry":{"message":"readyProbe: Success - Tested"}}
-
 
 > [!NOTE]
 > New Tests for this stage:  
