@@ -468,7 +468,7 @@ curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/
 > [!NOTE]
 > New Tests for this stage:  
 
-Validate Addond Build:
+Validate Add-on Build:
 ```
 docker compose --env-file .env -f stages/09-addons/compose.yaml ps alfresco share
 docker image ls --format '{{.Repository}}:{{.Tag}}' | grep -E \
