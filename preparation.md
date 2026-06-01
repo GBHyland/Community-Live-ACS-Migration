@@ -2,7 +2,34 @@
 
 ---  
 
-**Connect to your provided Server and follow these steps on that server**
+## Connect to your provided Server  
+
+
+#### Download the necessary pem file:  
+1. Go to http://54.196.34.183/share/
+2. Login with the username and password: ```clive2026```
+3. Go to Shared Documents
+4. Download the CLIVE2026.PEM file
+
+
+**Connect to your Alfresco instance**
+
+#### Windows
+```
+Host CommunityLive-ACS1
+    HostName ec2-(assigned IP).compute-1.amazonaws.com
+    IdentityFile \Users\(local user)\Downloads\CLIVE2026.pem
+    User ubuntu
+```
+#### Mac/Linux
+```
+Host CommunityLive-ACS1
+    HostName ec2-(assigned IP).compute-1.amazonaws.com
+    IdentityFile /Users/(local user)/Downloads/CLIVE2026.pem
+    User ubuntu
+```
+
+
 
 ### Update the Server
 ```
