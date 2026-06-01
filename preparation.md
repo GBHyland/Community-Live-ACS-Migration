@@ -29,7 +29,9 @@ Host CommunityLive-ACS1
     User ubuntu
 ```
 
+---  
 
+## Preparation:
 
 ### Update the Server
 ```
