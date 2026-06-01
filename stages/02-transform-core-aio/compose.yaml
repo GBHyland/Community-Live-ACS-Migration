@@ -1,9 +1,6 @@
 name: acs26-stage02
 
 services:
-
-  # PostgreSQL database used by ACS to store metadata,
-  # users, permissions, workflow state, and configuration.
   postgres:
     image: postgres:${POSTGRES_TAG}
     environment:
@@ -11,27 +8,18 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  # NEW IN STAGE 02
-  # Transform Core AIO provides document transformation services.
-  # ACS uses this service to generate thumbnails, previews,
-  # text extraction, PDF conversions, and other content renditions.
   transform-core-aio:
     image: quay.io/alfresco/alfresco-transform-core-aio:${TRANSFORM_CORE_AIO_TAG}
 
-  # Alfresco Content Repository.
-  # Provides content storage, APIs, metadata management,
-  # versioning, security, and document services.
   alfresco:
     image: quay.io/alfresco/alfresco-content-repository:${ACS_TAG}
     depends_on:
       - postgres
       - transform-core-aio
     ports:
-      # Exposes ACS over HTTP so users and applications can connect.
       - "${REPO_HTTP_PORT}:8080"
     environment:
       JAVA_TOOL_OPTIONS: >-
-        # Content encryption and metadata encryption configuration.
         -Dencryption.keystore.type=JCEKS
         -Dencryption.cipherAlgorithm=DESede/CBC/PKCS5Padding
         -Dencryption.keyAlgorithm=DESede
@@ -40,33 +28,17 @@ services:
         -Dmetadata-keystore.aliases=metadata
         -Dmetadata-keystore.metadata.password=${METADATA_KEYSTORE_METADATA_PASSWORD}
         -Dmetadata-keystore.metadata.algorithm=DESede
-
       JAVA_OPTS: >-
-        # Connect ACS to the PostgreSQL database container.
         -Ddb.driver=org.postgresql.Driver
         -Ddb.username=${POSTGRES_USER}
         -Ddb.password=${POSTGRES_PASSWORD}
         -Ddb.url=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-
-        # Search is still disabled at this stage.
         -Dindex.subsystem.name=noindex
-
-        # Events and messaging are still disabled until later stages.
         -Dalfresco.events.include=
         -Dmessaging.subsystem.autoStart=false
-
-        # NEW IN STAGE 02
-        # Configure ACS to use the Transform Core AIO service
-        # for document preview and rendition generation.
         -DlocalTransform.core-aio.url=http://transform-core-aio:8090/
-
-        # Simplify local development configuration.
         -Dcsrf.filter.enabled=false
-
-        # Indicate deployment is running in Docker Compose.
         -Ddeployment.method=DOCKER_COMPOSE
-
-        # Repository URL configuration used by ACS.
         -Dalfresco.host=localhost
         -Dalfresco.port=${REPO_HTTP_PORT}
         -Dalfresco.protocol=http

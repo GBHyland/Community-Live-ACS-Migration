@@ -1,9 +1,6 @@
 name: acs26-stage03
 
 services:
-
-  # PostgreSQL database used by ACS to store metadata,
-  # users, permissions, workflow state, and configuration.
   postgres:
     image: postgres:${POSTGRES_TAG}
     environment:
@@ -11,43 +8,28 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  # NEW IN STAGE 03
-  # ActiveMQ provides the messaging layer used by ACS and
-  # transformation services to communicate through queues.
   activemq:
     image: quay.io/alfresco/alfresco-activemq:${ACTIVEMQ_TAG}
     ports:
-      # Exposes the ActiveMQ web console for viewing queues and messages.
       - "${ACTIVEMQ_WEB_PORT}:8161"
     environment:
       ACTIVEMQ_USERNAME: ${ACTIVEMQ_USERNAME}
       ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
 
-  # NEW IN STAGE 03
-  # Shared File Store provides temporary shared storage for
-  # content being passed between ACS and transform services.
   shared-file-store:
     image: quay.io/alfresco/alfresco-shared-file-store:${SHARED_FILE_STORE_TAG}
 
-  # Transform Core AIO performs the actual document transformations,
-  # such as previews, thumbnails, text extraction, and renditions.
   transform-core-aio:
     image: quay.io/alfresco/alfresco-transform-core-aio:${TRANSFORM_CORE_AIO_TAG}
     depends_on:
       - activemq
       - shared-file-store
     environment:
-      # Connects Transform Core AIO to ActiveMQ for transform messaging.
       ACTIVEMQ_URL: nio://activemq:61616
       ACTIVEMQ_USER: ${ACTIVEMQ_USERNAME}
       ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
-
-      # Connects Transform Core AIO to the Shared File Store.
       FILE_STORE_URL: http://shared-file-store:8099/alfresco/api/-default-/private/sfs/versions/1/file
 
-  # NEW IN STAGE 03
-  # Transform Router receives transform requests from ACS and routes
-  # them to the correct transform service.
   transform-router:
     image: quay.io/alfresco/alfresco-transform-router:${TRANSFORM_ROUTER_TAG}
     depends_on:
@@ -55,23 +37,13 @@ services:
       - shared-file-store
       - transform-core-aio
     environment:
-      # Connects the router to ActiveMQ for queued transform work.
       ACTIVEMQ_URL: nio://activemq:61616
-
-      # Registers Transform Core AIO as an available transform engine.
       CORE_AIO_URL: http://transform-core-aio:8090
-
-      # Gives the router access to shared temporary files.
       FILE_STORE_URL: http://shared-file-store:8099/alfresco/api/-default-/private/sfs/versions/1/file
-
       JAVA_OPTS: >-
-        # ActiveMQ credentials used by the transform router.
         -Dqueue.engine.activemq.user=${ACTIVEMQ_USERNAME}
         -Dqueue.engine.activemq.password=${ACTIVEMQ_PASSWORD}
 
-  # Alfresco Content Repository.
-  # Provides content storage, APIs, metadata management,
-  # versioning, security, and document services.
   alfresco:
     image: quay.io/alfresco/alfresco-content-repository:${ACS_TAG}
     depends_on:
@@ -79,11 +51,9 @@ services:
       - activemq
       - transform-router
     ports:
-      # Exposes ACS over HTTP so users and applications can connect.
       - "${REPO_HTTP_PORT}:8080"
     environment:
       JAVA_TOOL_OPTIONS: >-
-        # Content encryption and metadata encryption configuration.
         -Dencryption.keystore.type=JCEKS
         -Dencryption.cipherAlgorithm=DESede/CBC/PKCS5Padding
         -Dencryption.keyAlgorithm=DESede
@@ -92,42 +62,22 @@ services:
         -Dmetadata-keystore.aliases=metadata
         -Dmetadata-keystore.metadata.password=${METADATA_KEYSTORE_METADATA_PASSWORD}
         -Dmetadata-keystore.metadata.algorithm=DESede
-
       JAVA_OPTS: >-
-        # Connect ACS to the PostgreSQL database container.
         -Ddb.driver=org.postgresql.Driver
         -Ddb.username=${POSTGRES_USER}
         -Ddb.password=${POSTGRES_PASSWORD}
         -Ddb.url=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-
-        # Search is still disabled at this stage.
         -Dindex.subsystem.name=noindex
-
-        # NEW IN STAGE 03
-        # Connect ACS to ActiveMQ for messaging and queued work.
         -Dmessaging.broker.url="failover:(nio://activemq:61616)?timeout=3000&jms.useCompression=true"
         -Dmessaging.broker.username=${ACTIVEMQ_USERNAME}
         -Dmessaging.broker.password=${ACTIVEMQ_PASSWORD}
-
-        # NEW IN STAGE 03
-        # Enable the remote transform service architecture.
         -Dtransform.service.enabled=true
         -Dtransform.service.url=http://transform-router:8095
         -Dsfs.url=http://shared-file-store:8099/
-
-        # Disable legacy/local transformation behavior.
         -Dlegacy.transform.service.enabled=false
-
-        # Direct Core AIO URL remains available for local transform configuration.
         -DlocalTransform.core-aio.url=http://transform-core-aio:8090/
-
-        # Simplify local development configuration.
         -Dcsrf.filter.enabled=false
-
-        # Indicate deployment is running in Docker Compose.
         -Ddeployment.method=DOCKER_COMPOSE
-
-        # Repository URL configuration used by ACS.
         -Dalfresco.host=localhost
         -Dalfresco.port=${REPO_HTTP_PORT}
         -Dalfresco.protocol=http

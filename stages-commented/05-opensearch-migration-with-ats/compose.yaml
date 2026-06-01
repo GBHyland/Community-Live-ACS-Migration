@@ -1,6 +1,9 @@
 name: acs26-stage05
 
 services:
+
+  # PostgreSQL database used by ACS to store metadata,
+  # users, permissions, workflow state, and configuration.
   postgres:
     image: postgres:${POSTGRES_TAG}
     environment:
@@ -8,17 +11,27 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
+  # NEW IN STAGE 05
+  # OpenSearch replaces Solr as the search engine.
+  # Stores and serves all ACS search indexes.
   opensearch:
     image: opensearchproject/opensearch:${OPENSEARCH_TAG}
     environment:
+      # Simplified single-node configuration for training and development.
       DISABLE_SECURITY_PLUGIN: "true"
       DISABLE_INSTALL_DEMO_CONFIG: "true"
       discovery.type: single-node
+
+      # JVM memory allocation.
       OPENSEARCH_JAVA_OPTS: -Xms512m -Xmx512m
+
+      # Prevent low-disk checks from blocking startup in labs.
       cluster.routing.allocation.disk.threshold_enabled: "false"
     ports:
+      # OpenSearch REST API endpoint.
       - "9200:9200"
 
+  # ActiveMQ provides messaging between ACS and supporting services.
   activemq:
     image: quay.io/alfresco/alfresco-activemq:${ACTIVEMQ_TAG}
     ports:
@@ -27,9 +40,12 @@ services:
       ACTIVEMQ_USERNAME: ${ACTIVEMQ_USERNAME}
       ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
 
+  # Shared temporary storage used by transformation services.
   shared-file-store:
     image: quay.io/alfresco/alfresco-shared-file-store:${SHARED_FILE_STORE_TAG}
 
+  # Performs document transformations, preview generation,
+  # thumbnail creation, and text extraction.
   transform-core-aio:
     image: quay.io/alfresco/alfresco-transform-core-aio:${TRANSFORM_CORE_AIO_TAG}
     depends_on:
@@ -41,6 +57,7 @@ services:
       ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
       FILE_STORE_URL: http://shared-file-store:8099/alfresco/api/-default-/private/sfs/versions/1/file
 
+  # Routes transformation requests to available transform engines.
   transform-router:
     image: quay.io/alfresco/alfresco-transform-router:${TRANSFORM_ROUTER_TAG}
     depends_on:
@@ -55,6 +72,8 @@ services:
         -Dqueue.engine.activemq.user=${ACTIVEMQ_USERNAME}
         -Dqueue.engine.activemq.password=${ACTIVEMQ_PASSWORD}
 
+  # Alfresco Content Repository.
+  # Core content services platform.
   alfresco:
     image: quay.io/alfresco/alfresco-content-repository:${ACS_TAG}
     depends_on:
@@ -66,6 +85,7 @@ services:
       - "${REPO_HTTP_PORT}:8080"
     environment:
       JAVA_TOOL_OPTIONS: >-
+        # Content encryption configuration.
         -Dencryption.keystore.type=JCEKS
         -Dencryption.cipherAlgorithm=DESede/CBC/PKCS5Padding
         -Dencryption.keyAlgorithm=DESede
@@ -74,30 +94,46 @@ services:
         -Dmetadata-keystore.aliases=metadata
         -Dmetadata-keystore.metadata.password=${METADATA_KEYSTORE_METADATA_PASSWORD}
         -Dmetadata-keystore.metadata.algorithm=DESede
+
       JAVA_OPTS: >-
+        # Database connection.
         -Ddb.driver=org.postgresql.Driver
         -Ddb.username=${POSTGRES_USER}
         -Ddb.password=${POSTGRES_PASSWORD}
         -Ddb.url=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-        -Ddeployment.method=DOCKER_COMPOSE
-        -Dalfresco.host=localhost
-        -Dalfresco.port=${REPO_HTTP_PORT}
-        -Dalfresco.protocol=http
+
+        # NEW IN STAGE 05
+        # Configure ACS to use OpenSearch instead of Solr.
         -Dindex.subsystem.name=elasticsearch
         -Delasticsearch.indexName=alfresco
         -Delasticsearch.createIndexIfNotExists=true
         -Delasticsearch.host=opensearch
         -Delasticsearch.port=9200
         -Delasticsearch.secureComms=none
+
+        # Messaging configuration.
         -Dmessaging.broker.url="failover:(nio://activemq:61616)?timeout=3000&jms.useCompression=true"
         -Dmessaging.broker.username=${ACTIVEMQ_USERNAME}
         -Dmessaging.broker.password=${ACTIVEMQ_PASSWORD}
+
+        # Transformation configuration.
         -Dtransform.service.enabled=true
         -Dtransform.service.url=http://transform-router:8095
         -Dsfs.url=http://shared-file-store:8099/
         -Dlegacy.transform.service.enabled=false
         -DlocalTransform.core-aio.url=http://transform-core-aio:8090/
+
+        # Local development configuration.
         -Dcsrf.filter.enabled=false
+
+        -Ddeployment.method=DOCKER_COMPOSE
+
+        -Dalfresco.host=localhost
+        -Dalfresco.port=${REPO_HTTP_PORT}
+        -Dalfresco.protocol=http
+
+    # Health check used by indexing services to ensure
+    # ACS is fully available before indexing begins.
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-"]
       interval: 30s
@@ -105,6 +141,9 @@ services:
       retries: 5
       start_period: 1m
 
+  # NEW IN STAGE 05
+  # Continuously listens for repository changes and updates
+  # OpenSearch indexes in near real time.
   search-live-indexing:
     image: quay.io/alfresco/alfresco-elasticsearch-live-indexing:${SEARCH_LIVE_INDEXING_TAG}
     depends_on:
@@ -122,9 +161,12 @@ services:
       ALFRESCO_ACCEPTED_CONTENT_MEDIA_TYPES_CACHE_BASE_URL: http://transform-core-aio:8090/transform/config
       ALFRESCO_SHAREDFILESTORE_BASEURL: http://shared-file-store:8099/alfresco/api/-default-/private/sfs/versions/1/file/
 
+  # NEW IN STAGE 05
+  # One-time bootstrap indexing job.
+  # Reads existing repository content and creates the
+  # initial OpenSearch indexes.
   search-reindexing:
     image: quay.io/alfresco/alfresco-elasticsearch-reindexing:${SEARCH_REINDEXING_TAG}
-    # One-shot bootstrap job: retry transient failures, then exit permanently on success.
     restart: on-failure:5
     depends_on:
       postgres:
@@ -134,15 +176,12 @@ services:
       alfresco:
         condition: service_healthy
     environment:
-      ALFRESCO_ACCEPTED_CONTENT_MEDIA_TYPES_CACHE_BASE_URL: http://transform-core-aio:8090/transform/config
-      SPRING_ACTIVEMQ_BROKERURL: nio://activemq:61616
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SPRING_ELASTICSEARCH_REST_URIS: http://opensearch:9200
-      ALFRESCO_REINDEX_PREFIXES_FILE: file:/config/reindex.prefixes-file.json
+
+      # Controls how repository content is reindexed.
       ALFRESCO_REINDEX_BATCH_SIZE: 100
       ALFRESCO_REINDEX_FROM_ID: 1
       ALFRESCO_REINDEX_TO_ID: 100000000
-    volumes:
-      - ../../shared/reindex/reindex.prefixes-file.json:/config/reindex.prefixes-file.json:ro

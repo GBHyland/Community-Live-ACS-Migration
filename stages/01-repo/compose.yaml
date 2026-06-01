@@ -1,9 +1,6 @@
 name: acs26-stage01
 
 services:
-
-  # PostgreSQL database used by ACS to store metadata,
-  # users, permissions, workflow state, and configuration.
   postgres:
     image: postgres:${POSTGRES_TAG}
     environment:
@@ -11,19 +8,14 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  # Alfresco Content Repository.
-  # Provides content storage, APIs, metadata management,
-  # versioning, security, and document services.
   alfresco:
     image: quay.io/alfresco/alfresco-content-repository:${ACS_TAG}
     depends_on:
       - postgres
     ports:
-      # Exposes ACS over HTTP so users and applications can connect.
       - "${REPO_HTTP_PORT}:8080"
     environment:
       JAVA_TOOL_OPTIONS: >-
-        # Content encryption and metadata encryption configuration.
         -Dencryption.keystore.type=JCEKS
         -Dencryption.cipherAlgorithm=DESede/CBC/PKCS5Padding
         -Dencryption.keyAlgorithm=DESede
@@ -33,29 +25,16 @@ services:
         -Dmetadata-keystore.metadata.password=${METADATA_KEYSTORE_METADATA_PASSWORD}
         -Dmetadata-keystore.metadata.algorithm=DESede
       JAVA_OPTS: >-
-        # Connect ACS to the PostgreSQL database container.
         -Ddb.driver=org.postgresql.Driver
         -Ddb.username=${POSTGRES_USER}
         -Ddb.password=${POSTGRES_PASSWORD}
         -Ddb.url=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-
-        # Disable search indexing for this introductory stage.
         -Dindex.subsystem.name=noindex
-
-        # Disable events and messaging services not yet introduced.
         -Dalfresco.events.include=
         -Dmessaging.subsystem.autoStart=false
-
-        # Disable transformation services until later stages.
         -Dlocal.transform.service.enabled=false
-
-        # Simplify local development configuration.
         -Dcsrf.filter.enabled=false
-
-        # Indicate deployment is running in Docker Compose.
         -Ddeployment.method=DOCKER_COMPOSE
-
-        # Repository URL configuration used by ACS.
         -Dalfresco.host=localhost
         -Dalfresco.port=${REPO_HTTP_PORT}
         -Dalfresco.protocol=http

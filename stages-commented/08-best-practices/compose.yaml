@@ -1,5 +1,7 @@
 name: acs26-stage08
 
+# PostgreSQL database.
+  # Stage 08: Added persistence, health checks, resource limits, and auto-restart.
 services:
   postgres:
     image: postgres:${POSTGRES_TAG}
@@ -26,6 +28,8 @@ services:
       start_period: 5s
     restart: unless-stopped
 
+# OpenSearch search engine.
+  # Stage 08: Added persistence, health checks, resource limits, and production tuning.
   opensearch:
     image: opensearchproject/opensearch:${OPENSEARCH_TAG}
     deploy:
@@ -62,6 +66,8 @@ services:
       start_period: 30s
     restart: unless-stopped
 
+# ActiveMQ messaging broker.
+  # Stage 08: Added health checks, resource limits, and auto-restart.
   activemq:
     image: quay.io/alfresco/alfresco-activemq:${ACTIVEMQ_TAG}
     deploy:
@@ -85,6 +91,8 @@ services:
       start_period: 5s
     restart: unless-stopped
 
+# Shared storage for transformation services.
+  # Stage 08: Added persistence, health checks, cleanup policies, and resource limits.
   shared-file-store:
     image: quay.io/alfresco/alfresco-shared-file-store:${SHARED_FILE_STORE_TAG}
     deploy:
@@ -111,6 +119,8 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+  # Performs document transformations and preview generation.
+  # Stage 08: Added health checks, JVM tuning, resource limits, and dependency validation.
   transform-core-aio:
     image: quay.io/alfresco/alfresco-transform-core-aio:${TRANSFORM_CORE_AIO_TAG}
     deploy:
@@ -142,6 +152,8 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+# Routes transformation requests to transform engines.
+  # Stage 08: Added health checks, JVM tuning, resource limits, and dependency validation.
   transform-router:
     image: quay.io/alfresco/alfresco-transform-router:${TRANSFORM_ROUTER_TAG}
     deploy:
@@ -176,6 +188,8 @@ services:
       start_period: 20s
     restart: unless-stopped
 
+# Alfresco Content Repository.
+  # Stage 08: Added persistent content storage, health checks, JVM tuning, resource limits, and auto-restart
   alfresco:
     image: quay.io/alfresco/alfresco-content-repository:${ACS_TAG}
     deploy:
@@ -241,6 +255,8 @@ services:
       start_period: 1m
     restart: unless-stopped
 
+# Updates OpenSearch indexes as repository content changes.
+  # Stage 08: Added health checks, JVM tuning, resource limits, and dependency validation.
   search-live-indexing:
     image: quay.io/alfresco/alfresco-elasticsearch-live-indexing:${SEARCH_LIVE_INDEXING_TAG}
     deploy:
@@ -280,6 +296,8 @@ services:
       start_period: 20s
     restart: unless-stopped
 
+# Initial repository-to-OpenSearch indexing job.
+  # Stage 08: Added resource limits, JVM tuning, and retry handling.
   search-reindexing:
     image: quay.io/alfresco/alfresco-elasticsearch-reindexing:${SEARCH_REINDEXING_TAG}
     deploy:
@@ -322,6 +340,8 @@ services:
     volumes:
       - ../../shared/reindex/reindex.prefixes-file.json:/config/reindex.prefixes-file.json:ro
 
+# Modern Angular-based user interface.
+  # Stage 08: Added health checks, resource limits, and auto-restart.
   digital-workspace:
     image: quay.io/alfresco/alfresco-digital-workspace:${ADW_TAG}
     deploy:
@@ -351,6 +371,8 @@ services:
       start_period: 5s
     restart: unless-stopped
 
+# Administrative monitoring and management UI.
+  # Stage 08: Added health checks, resource limits, and auto-restart.
   control-center:
     image: quay.io/alfresco/alfresco-control-center:${CONTROL_CENTER_TAG}
     deploy:
@@ -376,6 +398,8 @@ services:
       start_period: 5s
     restart: unless-stopped
 
+# Traditional Alfresco Share UI.
+  # Stage 08: Added health checks, resource limits, CSRF protection, and auto-restart.
   share:
     image: quay.io/alfresco/alfresco-share:${SHARE_TAG}
     deploy:
@@ -409,6 +433,8 @@ services:
       start_period: 15s
     restart: unless-stopped
 
+# Nginx reverse proxy and single platform entry point.
+  # Stage 08: Added health checks, resource limits, auto-restart, and dependency validation.
   proxy:
     image: nginx:${NGINX_TAG}
     deploy:

@@ -1,9 +1,6 @@
 name: acs26-stage04
 
 services:
-
-  # PostgreSQL database used by ACS to store metadata,
-  # users, permissions, workflow state, and configuration.
   postgres:
     image: postgres:${POSTGRES_TAG}
     environment:
@@ -11,36 +8,20 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
-  # NEW IN STAGE 04
-  # Alfresco Search Services (Solr).
-  # Creates and maintains search indexes for content,
-  # metadata, permissions, and full-text search.
   solr6:
     image: alfresco/alfresco-search-services:${SEARCH_SERVICES_TAG}
     environment:
-      # Connection information used by Solr to communicate with ACS.
       SOLR_ALFRESCO_HOST: alfresco
       SOLR_ALFRESCO_PORT: "8080"
-
-      # Solr server configuration.
       SOLR_SOLR_HOST: solr6
       SOLR_SOLR_PORT: "8983"
-
-      # Creates the standard Alfresco and Archive indexes.
       SOLR_CREATE_ALFRESCO_DEFAULTS: alfresco,archive
-
-      # Enables secure communication between ACS and Solr.
       ALFRESCO_SECURE_COMMS: secret
-
       JAVA_TOOL_OPTIONS: >-
         -Dalfresco.secureComms.secret=secret
-
     ports:
-      # Exposes the Solr administration console.
       - "${SOLR_HTTP_PORT}:8983"
 
-  # ActiveMQ provides the messaging layer used by ACS and
-  # transformation services to communicate through queues.
   activemq:
     image: quay.io/alfresco/alfresco-activemq:${ACTIVEMQ_TAG}
     ports:
@@ -49,13 +30,9 @@ services:
       ACTIVEMQ_USERNAME: ${ACTIVEMQ_USERNAME}
       ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
 
-  # Shared File Store provides temporary shared storage for
-  # content being passed between ACS and transform services.
   shared-file-store:
     image: quay.io/alfresco/alfresco-shared-file-store:${SHARED_FILE_STORE_TAG}
 
-  # Transform Core AIO performs the actual document transformations,
-  # such as previews, thumbnails, text extraction, and renditions.
   transform-core-aio:
     image: quay.io/alfresco/alfresco-transform-core-aio:${TRANSFORM_CORE_AIO_TAG}
     depends_on:
@@ -67,8 +44,6 @@ services:
       ACTIVEMQ_PASSWORD: ${ACTIVEMQ_PASSWORD}
       FILE_STORE_URL: http://shared-file-store:8099/alfresco/api/-default-/private/sfs/versions/1/file
 
-  # Transform Router receives transform requests from ACS and routes
-  # them to the correct transform service.
   transform-router:
     image: quay.io/alfresco/alfresco-transform-router:${TRANSFORM_ROUTER_TAG}
     depends_on:
@@ -83,9 +58,6 @@ services:
         -Dqueue.engine.activemq.user=${ACTIVEMQ_USERNAME}
         -Dqueue.engine.activemq.password=${ACTIVEMQ_PASSWORD}
 
-  # Alfresco Content Repository.
-  # Provides content storage, APIs, metadata management,
-  # versioning, security, and document services.
   alfresco:
     image: quay.io/alfresco/alfresco-content-repository:${ACS_TAG}
     depends_on:
@@ -97,7 +69,6 @@ services:
       - "${REPO_HTTP_PORT}:8080"
     environment:
       JAVA_TOOL_OPTIONS: >-
-        # Content encryption and metadata encryption configuration.
         -Dencryption.keystore.type=JCEKS
         -Dencryption.cipherAlgorithm=DESede/CBC/PKCS5Padding
         -Dencryption.keyAlgorithm=DESede
@@ -106,44 +77,25 @@ services:
         -Dmetadata-keystore.aliases=metadata
         -Dmetadata-keystore.metadata.password=${METADATA_KEYSTORE_METADATA_PASSWORD}
         -Dmetadata-keystore.metadata.algorithm=DESede
-
       JAVA_OPTS: >-
-        # Connect ACS to the PostgreSQL database.
         -Ddb.driver=org.postgresql.Driver
         -Ddb.username=${POSTGRES_USER}
         -Ddb.password=${POSTGRES_PASSWORD}
         -Ddb.url=jdbc:postgresql://postgres:5432/${POSTGRES_DB}
-
-        # NEW IN STAGE 04
-        # Enable Solr-based indexing and search.
         -Dindex.subsystem.name=solr6
         -Dsolr.host=solr6
         -Dsolr.secureComms=secret
         -Dsolr.sharedSecret=secret
-
-        # Messaging configuration.
         -Dmessaging.broker.url="failover:(nio://activemq:61616)?timeout=3000&jms.useCompression=true"
         -Dmessaging.broker.username=${ACTIVEMQ_USERNAME}
         -Dmessaging.broker.password=${ACTIVEMQ_PASSWORD}
-
-        # Remote transformation configuration.
         -Dtransform.service.enabled=true
         -Dtransform.service.url=http://transform-router:8095
         -Dsfs.url=http://shared-file-store:8099/
-
-        # Disable legacy transformation framework.
         -Dlegacy.transform.service.enabled=false
-
-        # Direct Core AIO access.
         -DlocalTransform.core-aio.url=http://transform-core-aio:8090/
-
-        # Simplify local development configuration.
         -Dcsrf.filter.enabled=false
-
-        # Indicate deployment is running in Docker Compose.
         -Ddeployment.method=DOCKER_COMPOSE
-
-        # Repository URL configuration.
         -Dalfresco.host=localhost
         -Dalfresco.port=${REPO_HTTP_PORT}
         -Dalfresco.protocol=http
