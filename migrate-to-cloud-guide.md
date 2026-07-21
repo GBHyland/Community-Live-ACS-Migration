@@ -324,13 +324,12 @@ curl -f http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/
 
 1. Open `http://your-ip:8081/` (ADW) in your browser.
 2. Log in with credentials from .env (loacted in root directory) (default should be: `admin` / `admin`).
-3. Open `http://your-ip:8082/share` (use same credentials from above).
-4. Create a site then create a new text document with a unique word in its body (for example: `stage06-e2e-2026`).
+3. Navigate to **My Libraries**.
+4. Create a Library (Site) then create a new text document with a unique word in its body (for example: `stage06-e2e-2026`).
 5. Search in share for that unique word and open the returned document.
-7. Open `http://your-ip:8083/` (Control Center) and confirm login works.
 
 > Expected:  
-> Login works in all three UIs, upload succeeds, and full-text search returns the newly uploaded document.  
+> Login works in ADW, upload succeeds, and full-text search returns the newly uploaded document.  
 > This confirms repo, transform, messaging, and OpenSearch indexing are working together.  
 
 
