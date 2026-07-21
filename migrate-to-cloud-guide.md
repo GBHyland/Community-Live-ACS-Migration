@@ -12,9 +12,11 @@
 | 06    | User Interface and Application Access Layer     |
 | 07    | Centralized Reverse Proxy and Routing Layer     |
 | 08    | Production-Ready Operational Architecture       |
+<!--
 | 09    | Custom Addon and Extension Deployment Platform  |
 | 10    | Externalized Configuration and Data Management  |
 | 11    | Secure HTTPS and SSL Access Architecture        |
+-->
 
 
 ---  
@@ -411,6 +413,10 @@ docker compose --env-file .env -f stages/08-best-practices/compose.yaml ps | gre
 
 ---  
 
+You have now built the basic production-ready Alfresco Content Services Environment.  
+
+
+<!--
 ## Stage 09
 This stage builds on Stage 08 by adding custom addon support for Alfresco Repository and Share, changing the Alfresco Repository and Share to add a customization layer making it more extensible.
 
@@ -510,7 +516,7 @@ openssl s_client -connect localhost:8443 -tls1_3
 > HTTPS probe succeeds, HTTP endpoint redirects, and TLS 1.3 handshake is established
 
 
-
+-->
 
 
 
